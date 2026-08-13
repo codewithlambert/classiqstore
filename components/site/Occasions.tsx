@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 const occasions = [
-  { label: "Work",    desc: "Boardroom ready",    img: "/product-1.jpg", color: "from-blue-900/70",   slug: "work" },
-  { label: "Weekend", desc: "Effortlessly casual", img: "/product-2.jpg", color: "from-slate-800/70",  slug: "weekend" },
-  { label: "Event",   desc: "Dress to impress",   img: "/product-3.jpg", color: "from-indigo-900/70", slug: "event" },
-  { label: "Casual",  desc: "Everyday ease",      img: "/product-4.jpg", color: "from-blue-800/70",   slug: "casual" },
+  { label: "Work",    desc: "Office ready shoes",  img: "/product-1.jpg", color: "from-blue-900/70",   slug: "work" },
+  { label: "Weekend", desc: "Casual bags & flats", img: "/product-2.jpg", color: "from-slate-800/70",  slug: "weekend" },
+  { label: "Event",   desc: "Evening heels",       img: "/product-3.jpg", color: "from-indigo-900/70", slug: "event" },
+  { label: "Travel", desc: "Travel ready bags",   img: "/product-4.jpg", color: "from-blue-800/70",   slug: "travel" },
 ];
 
 export default function Occasions() {
@@ -18,7 +18,7 @@ export default function Occasions() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {occasions.map(({ label, desc, img, color, slug }) => (
-            <Link key={label} href={`/shop?occasion=${slug}`} className="relative rounded-2xl overflow-hidden aspect-[3/4] group cursor-pointer">
+            <Link key={label} href={`/shop?occasion=${slug}`} className="relative rounded-full overflow-hidden aspect-[3/4] group cursor-pointer">
               <Image src={img} alt={label} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 25vw" />
               <div className={`absolute inset-0 bg-gradient-to-t ${color} to-transparent`} />
               <div className="absolute bottom-0 left-0 right-0 p-5 flex flex-col gap-1">

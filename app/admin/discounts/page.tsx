@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Trash2, Copy } from "lucide-react";
+import { Plus, Trash2, Copy, Send } from "lucide-react";
 
 interface Discount {
   id: string;
@@ -29,7 +29,10 @@ export default function DiscountsPage() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [sendingPromo, setSendingPromo] = useState(false);
+  const [promoMsg,     setPromoMsg]     = useState("");
+  const [promoTarget,  setPromoTarget]  = useState<{ discountId: string; pct: number; code: string } | null>(null);
+  const [promoExpiry,  setPromoExpiry]  = useState("");
   const [form, setForm] = useState({
     code: "", type: "percentage" as "percentage" | "fixed",
     value: "", min_order: "", max_uses: "", expires_at: "", active: true,
@@ -44,6 +47,29 @@ export default function DiscountsPage() {
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const [saving, setSaving] = useState(false);
+
+  async function sendPromoEmail(d: Discount) {
+    if (d.type !== "percentage") { alert("Promo emails only supported for percentage discounts."); return; }
+    setPromoTarget({ discountId: d.id, pct: d.value, code: d.code });
+    setPromoExpiry(d.expires_at ? new Date(d.expires_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "31 December 2025");
+  }
+
+  async function confirmSendPromo() {
+    if (!promoTarget) return;
+    setSendingPromo(true);
+    const res = await fetch("/api/emails/discount", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ code: promoTarget.code, discountPct: promoTarget.pct, expiryDate: promoExpiry }),
+    });
+    const data = await res.json();
+    setSendingPromo(false);
+    setPromoMsg(data.ok ? `Sent to ${data.sent} user${data.sent !== 1 ? "s" : ""} ✓` : "Failed.");
+    setPromoTarget(null);
+    setTimeout(() => setPromoMsg(""), 5000);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

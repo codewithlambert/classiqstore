@@ -2,14 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 const items = [
-  { id: 1, rank: 1, name: "Silk Wrap Dress",        meta: "women clothing",    img: "/product-1.jpg", price: "₦61,500" },
-  { id: 4, rank: 2, name: "Strappy Heeled Mules",    meta: "women footwear",    img: "/product-2.jpg", price: "₦51,500" },
-  { id: 3, rank: 3, name: "Wide Leg Linen Trousers", meta: "women clothing",    img: "/product-3.jpg", price: "₦39,500" },
-  { id: 2, rank: 4, name: "Cream Leather Sneakers",  meta: "women footwear",    img: "/product-4.jpg", price: "₦54,000" },
-  { id: 5, rank: 5, name: "Knit Cardigan",           meta: "women knitwear",    img: "/product-5.jpg", price: "₦47,500" },
-  { id: 8, rank: 6, name: "Ankle Strap Heels",       meta: "women footwear",    img: "/product-1.jpg", price: "₦58,500" },
-  { id: 7, rank: 7, name: "Tailored Blazer",         meta: "women clothing",    img: "/product-2.jpg", price: "₦78,000" },
-  { id: 6, rank: 8, name: "Gold Hoop Earrings",      meta: "women accessories", img: "/product-3.jpg", price: "₦18,000" },
+  { id: 1, rank: 1, name: "Strappy Heeled Mules",    meta: "women shoes",       img: "/product-2.jpg", price: "₦51,500" },
+  { id: 2, rank: 2, name: "Cream Leather Sneakers",  meta: "women shoes",       img: "/product-4.jpg", price: "₦54,000" },
+  { id: 3, rank: 3, name: "Leather Tote Bag",        meta: "women bags",        img: "/product-1.jpg", price: "₦72,000" },
+  { id: 4, rank: 4, name: "Ankle Strap Heels",        meta: "women shoes",       img: "/product-1.jpg", price: "₦58,500" },
+  { id: 5, rank: 5, name: "Crossbody Bag",           meta: "women bags",        img: "/product-5.jpg", price: "₦45,500" },
+  { id: 6, rank: 6, name: "Classic Flats",           meta: "women shoes",       img: "/product-3.jpg", price: "₦42,000" },
+  { id: 7, rank: 7, name: "Structured Handbag",     meta: "women bags",        img: "/product-2.jpg", price: "₦68,500" },
+  { id: 8, rank: 8, name: "Evening Clutch",          meta: "women bags",        img: "/product-3.jpg", price: "₦38,000" },
 ];
 
 export default function Trending() {
@@ -36,7 +36,7 @@ export default function Trending() {
             <Link key={item.id} href={`/products/${item.id}`} className="bg-white border border-blue-100 rounded-2xl overflow-hidden flex flex-col group">
 
               {/* Image */}
-              <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-full bg-muted">
                 <Image
                   src={item.img}
                   alt={item.name}

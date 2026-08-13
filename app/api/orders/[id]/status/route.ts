@@ -20,8 +20,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const customerName = order.profiles?.full_name ?? "Customer";
   if (customerEmail) {
     try {
-      const payload = orderStatusEmail(customerName, `NV-${id.slice(0, 8).toUpperCase()}`, status, order.total_amount);
-      payload.to = [{ email: customerEmail, name: customerName }];
+      const payload = orderStatusEmail(
+        customerName,
+        customerEmail,
+        `NV-${id.slice(0, 8).toUpperCase()}`,
+        status,
+        order.total_amount
+      );
       await sendEmail(payload);
     } catch (e) { console.error("Brevo email failed:", e); }
   }

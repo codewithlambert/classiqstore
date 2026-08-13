@@ -257,7 +257,7 @@ function AuthForm() {
       {/* Desktop */}
       <div className="hidden lg:grid grid-cols-2 min-h-screen">
         <div className="relative overflow-hidden">
-          <Image src="/hero-1.jpg" alt="CLASSIQ" fill className="object-cover object-top" sizes="50vw" priority />
+          <Image src="/product-3.jpg" alt="CLASSIQ" fill className="object-cover object-center" sizes="50vw" priority />
           <div className="absolute inset-0 bg-foreground/45" />
           <div className="absolute inset-0 flex flex-col justify-between p-14">
             <Link href="/" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white transition-colors">
@@ -280,7 +280,7 @@ function AuthForm() {
       {/* Mobile */}
       <div className="lg:hidden relative min-h-screen flex items-center justify-center px-5 py-16">
         <div className="absolute inset-0 overflow-hidden">
-          <Image src="/hero-1.jpg" alt="CLASSIQ" fill className="object-cover object-top scale-110" sizes="100vw" priority />
+          <Image src="/product-3.jpg" alt="CLASSIQ" fill className="object-cover object-center scale-110" sizes="100vw" priority />
           <div className="absolute inset-0 backdrop-blur-xl bg-foreground/40" />
         </div>
         <div className="relative z-10 w-full flex flex-col items-center gap-6">

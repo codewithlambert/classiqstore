@@ -7,7 +7,7 @@ export default function Featured() {
         <div className="flex items-center justify-between mb-10">
           <div className="flex flex-col gap-1">
             <p className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Featured Collection</p>
-            <h2 className="font-display text-4xl md:text-5xl tracking-[-0.01em]">The Lumière Edit</h2>
+            <h2 className="font-display text-4xl md:text-5xl tracking-[-0.01em]">The Shoe & Bag Edit</h2>
           </div>
           <a href="/" className="px-5 py-2 rounded-full border border-foreground text-[10px] uppercase tracking-[0.18em] text-foreground hover:bg-foreground hover:text-background transition-colors duration-200">
             Explore
@@ -18,7 +18,7 @@ export default function Featured() {
         <div className="relative rounded-2xl overflow-hidden">
           <div className="grid grid-cols-3 gap-px bg-border">
             {["/story-1.jpg", "/product-1.jpg", "/story-3.jpg"].map((src, i) => (
-              <div key={src} className={`relative overflow-hidden bg-muted ${i === 1 ? "aspect-[3/5]" : "aspect-[3/4]"}`}>
+              <div key={src} className={`relative overflow-hidden rounded-full bg-muted ${i === 1 ? "aspect-[3/5]" : "aspect-[3/4]"}`}>
                 <Image src={src} alt="Collection look" fill className="object-cover" sizes="33vw" />
               </div>
             ))}
@@ -37,8 +37,8 @@ export default function Featured() {
               </h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Fluid silhouettes, tactile fabrics and a palette drawn from dawn light.
-              The Lumi&egrave;re Edit is femininity without apology.
+              Premium leather, refined designs and a palette drawn from dawn light.
+              The Shoe & Bag Edit is femininity without apology.
             </p>
             <button className="self-start px-6 py-3 rounded-full bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.18em] hover:bg-accent transition-colors duration-300">
               Shop the Edit

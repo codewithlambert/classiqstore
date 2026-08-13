@@ -2,60 +2,94 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowLeft, Lock, ChevronRight, CheckCircle,
-  CreditCard, Smartphone, Building2, Tag, ShoppingBag,
+  ArrowLeft, CheckCircle, ShoppingBag, MessageCircle, Lock, User, Phone, MapPin, Mail
 } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect } from "react";
+import { openWhatsAppCheckout, validateCheckoutData } from "@/lib/whatsapp";
+import type { WhatsAppCheckoutData } from "@/lib/types";
 
 const DELIVERY_FEE = 3500;
 const fmt = (n: number) => `₦${n.toLocaleString("en-NG")}`;
 
-const paymentMethods = [
-  { id: "card",        label: "Debit / Credit Card",  sub: "Visa, Mastercard, Verve",        icon: CreditCard },
-  { id: "transfer",    label: "Bank Transfer",         sub: "Pay directly from your bank",    icon: Building2 },
-  { id: "ussd",        label: "USSD",                  sub: "*737#, *919# and more",          icon: Smartphone },
-];
-
-type Step = "details" | "payment" | "confirm";
-
 export default function CheckoutPage() {
   const { items, clear } = useCart();
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [step,          setStep]          = useState<Step>("details");
-  const [payMethod,     setPayMethod]     = useState("card");
-  const [promoCode,     setPromoCode]     = useState("");
-  const [promoApplied,  setPromoApplied]  = useState(false);
-  const [processing,    setProcessing]    = useState(false);
-  const [done,          setDone]          = useState(false);
+  const [done, setDone] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
       setIsSignedIn(!!data.user);
+      if (data.user?.email) {
+        setForm(f => ({ ...f, email: data.user.email || '' }));
+      }
     });
   }, []);
 
   const [form, setForm] = useState({
-    firstName: "", lastName: "", email: "",
-    phone: "", address: "", city: "", state: "", zip: "",
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    notes: ""
   });
 
   const cartItems = items;
-  const subtotal  = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
-  const discount  = promoApplied ? Math.round(subtotal * 0.1) : 0;
-  const total     = subtotal - discount + DELIVERY_FEE;
+  const subtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = subtotal + DELIVERY_FEE;
 
-  const handleField = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+  const handleField = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const handlePay = () => {
+  const handleWhatsAppCheckout = () => {
+    setErrors([]);
+    
+    const checkoutData: WhatsAppCheckoutData = {
+      items: cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        img: item.img,
+        quantity: item.qty,
+        product_type: item.product_type,
+        attributes: item.attributes,
+        size: item.size,
+        color: item.color,
+      })),
+      total,
+      customerName: form.name,
+      customerPhone: form.phone,
+      customerEmail: form.email,
+      shippingAddress: `${form.address}, ${form.city}, ${form.state}`,
+      notes: form.notes,
+    };
+
+    const validation = validateCheckoutData(checkoutData);
+    
+    if (!validation.valid) {
+      setErrors(validation.errors);
+      return;
+    }
+
     setProcessing(true);
-    setTimeout(() => { setProcessing(false); setDone(true); clear(); }, 2800);
+    
+    // Open WhatsApp
+    openWhatsAppCheckout(checkoutData);
+    
+    // Mark as done
+    setTimeout(() => {
+      setProcessing(false);
+      setDone(true);
+      clear();
+    }, 1000);
   };
 
   /* ── Empty cart gate ── */
@@ -67,10 +101,10 @@ export default function CheckoutPage() {
             <ShoppingBag size={24} strokeWidth={1.4} className="text-primary" />
           </div>
           <div className="flex flex-col gap-2">
-            <h1 className="font-display text-3xl text-foreground">Your bag is empty</h1>
+            <h1 className="font-heading text-3xl text-foreground">Your bag is empty</h1>
             <p className="text-sm text-muted-foreground">Add some pieces before checking out.</p>
           </div>
-          <Link href="/" className="w-full py-4 rounded-full bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.18em] text-center hover:bg-accent transition-colors duration-300">
+          <Link href="/shop" className="w-full py-4 rounded-full bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.18em] text-center hover:bg-accent transition-colors duration-300">
             Continue shopping
           </Link>
         </div>
@@ -87,7 +121,7 @@ export default function CheckoutPage() {
             <Lock size={24} strokeWidth={1.4} className="text-primary" />
           </div>
           <div className="flex flex-col gap-2">
-            <h1 className="font-display text-3xl text-foreground">Sign in to checkout</h1>
+            <h1 className="font-heading text-3xl text-foreground">Sign in to checkout</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
               You need an account to complete your purchase. It only takes a moment.
             </p>
@@ -100,7 +134,7 @@ export default function CheckoutPage() {
               Create account
             </Link>
           </div>
-          <Link href="/" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/shop" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft size={12} strokeWidth={1.5} />
             Continue shopping
           </Link>
@@ -109,7 +143,7 @@ export default function CheckoutPage() {
     );
   }
 
-  /* ── Order confirmed ── */
+  /* ── Order sent to WhatsApp ── */
   if (done) {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center px-6 py-20">
@@ -118,20 +152,19 @@ export default function CheckoutPage() {
             <CheckCircle size={28} strokeWidth={1.4} className="text-emerald-600" />
           </div>
           <div className="flex flex-col gap-2">
-            <h1 className="font-display text-3xl text-foreground">Order confirmed!</h1>
+            <h1 className="font-heading text-3xl text-foreground">Order sent!</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Thank you for your order. We&apos;ve sent a confirmation to{" "}
-              <span className="text-foreground font-medium">{form.email || "your email"}</span>.
+              Your order has been sent via WhatsApp. We'll confirm and process it shortly.
             </p>
           </div>
           <div className="w-full glass rounded-2xl p-5 flex flex-col gap-3">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Order number</span>
-              <span className="font-medium text-foreground">#NV-00{Math.floor(Math.random() * 900 + 100)}</span>
+              <span className="text-muted-foreground">Total amount</span>
+              <span className="font-medium text-foreground">{fmt(total)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total paid</span>
-              <span className="font-medium text-foreground">{fmt(total)}</span>
+              <span className="text-muted-foreground">Delivery to</span>
+              <span className="font-medium text-foreground">{form.city}, {form.state}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Estimated delivery</span>
@@ -140,9 +173,9 @@ export default function CheckoutPage() {
           </div>
           <div className="flex flex-col gap-3 w-full">
             <Link href="/profile" className="w-full py-4 rounded-full bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.18em] text-center hover:bg-accent transition-colors duration-300">
-              Track my order
+              View my orders
             </Link>
-            <Link href="/" className="w-full py-4 rounded-full border border-border text-foreground text-[11px] uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors duration-200">
+            <Link href="/shop" className="w-full py-4 rounded-full border border-border text-foreground text-[11px] uppercase tracking-[0.18em] text-center hover:border-primary hover:text-primary transition-colors duration-200">
               Continue shopping
             </Link>
           </div>
@@ -153,269 +186,183 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-secondary pb-32 md:pb-16">
-
       {/* ── Top bar ── */}
       <div className="bg-background border-b border-border sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/shop" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft size={13} strokeWidth={1.5} />
             Back
           </Link>
-          <Link href="/" className="font-display text-xl tracking-[0.22em] text-foreground">CLASSIQ</Link>
+          <Link href="/" className="font-heading text-xl tracking-[0.22em] text-foreground">CLASSIQ</Link>
           <div className="flex items-center gap-1.5">
-            <Lock size={12} strokeWidth={1.5} className="text-muted-foreground" />
-            <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Secure checkout</span>
+            <MessageCircle size={12} strokeWidth={1.5} className="text-muted-foreground" />
+            <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">WhatsApp checkout</span>
           </div>
         </div>
       </div>
 
-      {/* ── Step indicator ── */}
-      <div className="max-w-6xl mx-auto px-6 py-6">
-        <div className="flex items-center gap-2">
-          {(["details", "payment", "confirm"] as Step[]).map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] uppercase tracking-[0.14em] transition-all duration-200 ${
-                step === s ? "bg-primary text-primary-foreground" :
-                (["details","payment","confirm"].indexOf(step) > i) ? "bg-primary/20 text-primary" :
-                "bg-background border border-border text-muted-foreground"
-              }`}>
-                <span>{i + 1}</span>
-                <span className="hidden sm:inline">{s === "details" ? "Delivery" : s === "payment" ? "Payment" : "Review"}</span>
-              </div>
-              {i < 2 && <ChevronRight size={14} strokeWidth={1.4} className="text-border shrink-0" />}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
-
+      <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
         {/* ══════════ LEFT COLUMN ══════════ */}
         <div className="flex flex-col gap-6">
+          <div className="glass rounded-3xl p-7 flex flex-col gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                <MessageCircle size={20} strokeWidth={1.5} className="text-green-600" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h2 className="font-heading text-2xl text-foreground">WhatsApp Checkout</h2>
+                <p className="text-xs text-muted-foreground">Complete your order via WhatsApp</p>
+              </div>
+            </div>
 
-          {/* ── STEP 1: Delivery details ── */}
-          {step === "details" && (
-            <div className="glass rounded-3xl p-7 flex flex-col gap-6">
-              <h2 className="font-display text-2xl text-foreground">Delivery details</h2>
+            {/* Error messages */}
+            {errors.length > 0 && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                <p className="text-sm font-medium text-red-800 mb-2">Please fix the following:</p>
+                <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                  {errors.map((error, i) => (
+                    <li key={i}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { key: "firstName", label: "First name",    col: 1 },
-                  { key: "lastName",  label: "Last name",     col: 1 },
-                  { key: "email",     label: "Email address", col: 2 },
-                  { key: "phone",     label: "Phone number",  col: 2 },
-                ].map(({ key, label, col }) => (
-                  <div key={key} className={`flex flex-col gap-1.5 ${col === 2 ? "col-span-2" : ""}`}>
-                    <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</label>
-                    <input
-                      type={key === "email" ? "email" : "text"}
-                      value={form[key as keyof typeof form]}
-                      onChange={handleField(key as keyof typeof form)}
-                      placeholder={label}
-                      className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-                ))}
+            {/* Customer info form */}
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
+                  <User size={12} />
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={handleField("name")}
+                  placeholder="John Doe"
+                  className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                  required
+                />
               </div>
 
-              <div className="w-full h-px bg-border" />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
+                  <Phone size={12} />
+                  Phone number
+                </label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={handleField("phone")}
+                  placeholder="+234 800 123 4567"
+                  className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                  required
+                />
+              </div>
 
-              <div className="flex flex-col gap-4">
-                <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Street address</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
+                  <Mail size={12} />
+                  Email address (optional)
+                </label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={handleField("email")}
+                  placeholder="john@example.com"
+                  className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                />
+              </div>
+
+              <div className="w-full h-px bg-border my-2" />
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
+                  <MapPin size={12} />
+                  Delivery address
+                </label>
                 <input
                   type="text"
                   value={form.address}
                   onChange={handleField("address")}
-                  placeholder="House number and street name"
+                  placeholder="Street address"
                   className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                  required
                 />
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { key: "city",  label: "City",     placeholder: "Lagos" },
-                    { key: "state", label: "State",    placeholder: "Lagos State" },
-                    { key: "zip",   label: "ZIP / Postcode", placeholder: "101241" },
-                  ].map(({ key, label, placeholder }) => (
-                    <div key={key} className="flex flex-col gap-1.5">
-                      <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</label>
-                      <input
-                        type="text"
-                        value={form[key as keyof typeof form]}
-                        onChange={handleField(key as keyof typeof form)}
-                        placeholder={placeholder}
-                        className="w-full border border-border rounded-full px-4 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
-                      />
-                    </div>
-                  ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">City</label>
+                  <input
+                    type="text"
+                    value={form.city}
+                    onChange={handleField("city")}
+                    placeholder="Lagos"
+                    className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">State</label>
+                  <input
+                    type="text"
+                    value={form.state}
+                    onChange={handleField("state")}
+                    placeholder="Lagos State"
+                    className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                    required
+                  />
                 </div>
               </div>
 
-              <button
-                onClick={() => setStep("payment")}
-                className="w-full py-4 rounded-full bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.18em] hover:bg-accent transition-colors duration-300 mt-2"
-              >
-                Continue to payment
-              </button>
-            </div>
-          )}
-
-          {/* ── STEP 2: Payment ── */}
-          {step === "payment" && (
-            <div className="flex flex-col gap-5">
-              <div className="glass rounded-3xl p-7 flex flex-col gap-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-display text-2xl text-foreground">Payment method</h2>
-                  <div className="flex items-center gap-1.5">
-                    <Lock size={12} strokeWidth={1.5} className="text-muted-foreground" />
-                    <span className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground">256-bit SSL</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  {paymentMethods.map(({ id, label, sub, icon: Icon }) => (
-                    <button
-                      key={id}
-                      onClick={() => setPayMethod(id)}
-                      className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                        payMethod === id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${payMethod === id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-                        <Icon size={17} strokeWidth={1.4} />
-                      </div>
-                      <div className="flex flex-col gap-0.5 flex-1">
-                        <span className="text-sm font-medium text-foreground">{label}</span>
-                        <span className="text-[10px] text-muted-foreground">{sub}</span>
-                      </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${payMethod === id ? "border-primary" : "border-border"}`}>
-                        {payMethod === id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Card fields — shown when card selected */}
-                {payMethod === "card" && (
-                  <div className="flex flex-col gap-4 pt-2">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Card number</label>
-                      <input type="text" placeholder="0000 0000 0000 0000" maxLength={19} className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Expiry</label>
-                        <input type="text" placeholder="MM / YY" maxLength={7} className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors" />
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">CVV</label>
-                        <input type="text" placeholder="•••" maxLength={4} className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors" />
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Name on card</label>
-                      <input type="text" placeholder="As it appears on your card" className="w-full border border-border rounded-full px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Bank transfer instructions */}
-                {payMethod === "transfer" && (
-                  <div className="bg-muted rounded-2xl p-5 flex flex-col gap-2">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Transfer details</p>
-                    <p className="text-sm text-foreground">You will receive bank account details after placing your order. Payment must be made within 24 hours.</p>
-                  </div>
-                )}
-
-                {/* USSD instructions */}
-                {payMethod === "ussd" && (
-                  <div className="bg-muted rounded-2xl p-5 flex flex-col gap-2">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">USSD instructions</p>
-                    <p className="text-sm text-foreground">Dial your bank&apos;s USSD code and follow the prompts. You will receive a reference code to complete payment.</p>
-                  </div>
-                )}
-
-                {/* Powered by */}
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <span className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Powered by</span>
-                  <span className="text-[11px] font-semibold text-foreground tracking-wide">Paystack</span>
-                  <span className="text-muted-foreground">·</span>
-                  <span className="text-[11px] font-semibold text-foreground tracking-wide">Flutterwave</span>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button onClick={() => setStep("details")} className="px-6 py-4 rounded-full border border-border text-[11px] uppercase tracking-[0.18em] text-foreground hover:border-primary hover:text-primary transition-colors duration-200">
-                  Back
-                </button>
-                <button onClick={() => setStep("confirm")} className="flex-1 py-4 rounded-full bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.18em] hover:bg-accent transition-colors duration-300">
-                  Review order
-                </button>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Additional notes (optional)</label>
+                <textarea
+                  value={form.notes}
+                  onChange={handleField("notes")}
+                  placeholder="Any special instructions for your order..."
+                  rows={3}
+                  className="w-full border border-border rounded-2xl px-5 py-3.5 text-sm text-foreground bg-background placeholder:text-muted-foreground outline-none focus:border-primary transition-colors resize-none"
+                />
               </div>
             </div>
-          )}
 
-          {/* ── STEP 3: Confirm ── */}
-          {step === "confirm" && (
-            <div className="flex flex-col gap-5">
-              {/* Delivery summary */}
-              <div className="glass rounded-3xl p-7 flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-display text-2xl text-foreground">Delivery</h2>
-                  <button onClick={() => setStep("details")} className="text-[10px] uppercase tracking-[0.14em] text-primary hover:text-accent transition-colors">Edit</button>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium text-foreground">{form.firstName} {form.lastName}</p>
-                  <p className="text-sm text-muted-foreground">{form.address}, {form.city}, {form.state}</p>
-                  <p className="text-sm text-muted-foreground">{form.phone} · {form.email}</p>
-                </div>
-              </div>
+            {/* WhatsApp checkout button */}
+            <button
+              onClick={handleWhatsAppCheckout}
+              disabled={processing}
+              className="w-full py-4 rounded-full bg-green-600 text-white text-[11px] uppercase tracking-[0.18em] hover:bg-green-700 transition-colors duration-300 disabled:opacity-70 flex items-center justify-center gap-2"
+            >
+              {processing ? (
+                <>
+                  <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  Opening WhatsApp…
+                </>
+              ) : (
+                <>
+                  <MessageCircle size={16} strokeWidth={1.5} />
+                  Complete Order via WhatsApp
+                </>
+              )}
+            </button>
 
-              {/* Payment summary */}
-              <div className="glass rounded-3xl p-7 flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-display text-2xl text-foreground">Payment</h2>
-                  <button onClick={() => setStep("payment")} className="text-[10px] uppercase tracking-[0.14em] text-primary hover:text-accent transition-colors">Edit</button>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {paymentMethods.find((m) => m.id === payMethod)?.label}
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button onClick={() => setStep("payment")} className="px-6 py-4 rounded-full border border-border text-[11px] uppercase tracking-[0.18em] text-foreground hover:border-primary hover:text-primary transition-colors duration-200">
-                  Back
-                </button>
-                <button
-                  onClick={handlePay}
-                  disabled={processing}
-                  className="flex-1 py-4 rounded-full bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.18em] hover:bg-accent transition-colors duration-300 disabled:opacity-70 flex items-center justify-center gap-2"
-                >
-                  {processing ? (
-                    <>
-                      <span className="w-4 h-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground animate-spin" />
-                      Processing…
-                    </>
-                  ) : (
-                    <>
-                      <Lock size={13} strokeWidth={1.5} />
-                      Pay {fmt(total)}
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
+            <p className="text-xs text-center text-muted-foreground leading-relaxed">
+              Clicking this button will open WhatsApp with your order details pre-filled. 
+              Send the message to confirm your order.
+            </p>
+          </div>
         </div>
 
         {/* ══════════ RIGHT COLUMN — Order summary ══════════ */}
         <div className="flex flex-col gap-4 lg:sticky lg:top-28">
           <div className="glass rounded-3xl p-6 flex flex-col gap-5">
-            <h2 className="font-display text-xl text-foreground">Order summary</h2>
+            <h2 className="font-heading text-xl text-foreground">Order summary</h2>
 
             {/* Items */}
             <div className="flex flex-col gap-4">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
-                  <div className="relative w-14 h-16 rounded-xl overflow-hidden bg-muted shrink-0">
+                  <div className="relative w-14 h-16 rounded-full overflow-hidden bg-muted shrink-0">
                     <Image src={item.img} alt={item.name} fill className="object-cover" sizes="56px" />
                     <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[9px] flex items-center justify-center font-medium">
                       {item.qty}
@@ -423,65 +370,39 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                     <p className="text-sm text-foreground truncate">{item.name}</p>
-                    <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground">Size {item.size}</p>
+                    {item.size && (
+                      <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground">Size {item.size}</p>
+                    )}
+                    {item.color && (
+                      <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{item.color}</p>
+                    )}
                   </div>
-                  <p className="font-display text-sm text-foreground shrink-0">{fmt(item.price * item.qty)}</p>
+                  <p className="font-heading text-sm text-foreground shrink-0">{fmt(item.price * item.qty)}</p>
                 </div>
               ))}
             </div>
-
-            <div className="w-full h-px bg-border" />
-
-            {/* Promo code */}
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-2 border border-border rounded-full px-4 py-2.5 bg-background focus-within:border-primary transition-colors">
-                <Tag size={13} strokeWidth={1.4} className="text-muted-foreground shrink-0" />
-                <input
-                  type="text"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                  placeholder="Promo code"
-                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-                  disabled={promoApplied}
-                />
-              </div>
-              <button
-                onClick={() => promoCode === "NOVA10" && setPromoApplied(true)}
-                disabled={promoApplied}
-                className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-[10px] uppercase tracking-[0.14em] hover:bg-accent transition-colors duration-200 disabled:opacity-50 shrink-0"
-              >
-                {promoApplied ? "Applied ✓" : "Apply"}
-              </button>
-            </div>
-            {promoApplied && (
-              <p className="text-[10px] text-emerald-600 uppercase tracking-[0.14em] -mt-2">
-                10% discount applied — {fmt(discount)} off
-              </p>
-            )}
 
             <div className="w-full h-px bg-border" />
 
             {/* Totals */}
             <div className="flex flex-col gap-2.5">
-              {[
-                { label: "Subtotal",  value: fmt(subtotal) },
-                { label: "Delivery",  value: fmt(DELIVERY_FEE) },
-                ...(promoApplied ? [{ label: "Discount (NOVA10)", value: `−${fmt(discount)}` }] : []),
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{label}</span>
-                  <span className="text-sm text-foreground">{value}</span>
-                </div>
-              ))}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Subtotal</span>
+                <span className="text-sm text-foreground">{fmt(subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Delivery</span>
+                <span className="text-sm text-foreground">{fmt(DELIVERY_FEE)}</span>
+              </div>
               <div className="flex items-center justify-between pt-2 border-t border-border mt-1">
                 <span className="text-sm font-medium text-foreground">Total</span>
-                <span className="font-display text-xl text-primary">{fmt(total)}</span>
+                <span className="font-heading text-xl text-primary">{fmt(total)}</span>
               </div>
             </div>
 
             {/* Trust badges */}
             <div className="flex flex-wrap gap-2 pt-1">
-              {["Free returns", "Secure payment", "Ships in 2–4 days"].map((t) => (
+              {["Easy WhatsApp checkout", "Ships in 2–4 days", "Secure ordering"].map((t) => (
                 <span key={t} className="px-3 py-1.5 rounded-full border border-border text-[9px] uppercase tracking-[0.12em] text-muted-foreground">
                   {t}
                 </span>

@@ -10,21 +10,28 @@ import { ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { useCart } from "@/store/cart";
 
 const allProducts = [
-  { id: 1, name: "Silk Wrap Dress",         price: "₦61,500", priceNum: 61500,  img: "/product-1.jpg", badge: "New",        meta: "women clothing",    occasions: ["event","weekend"] },
-  { id: 2, name: "Cream Leather Sneakers",  price: "₦54,000", priceNum: 54000,  img: "/product-2.jpg", badge: "Bestseller", meta: "women footwear",    occasions: ["casual","weekend"] },
-  { id: 3, name: "Wide Leg Linen Trousers", price: "₦39,500", priceNum: 39500,  img: "/product-3.jpg", badge: "New",        meta: "women clothing",    occasions: ["casual","work","weekend"] },
-  { id: 4, name: "Strappy Heeled Mules",    price: "₦51,500", priceNum: 51500,  img: "/product-4.jpg", badge: "New",        meta: "women footwear",    occasions: ["event","work"] },
-  { id: 5, name: "Knit Cardigan",           price: "₦47,500", priceNum: 47500,  img: "/product-5.jpg", badge: "Bestseller", meta: "women knitwear",    occasions: ["casual","weekend","work"] },
-  { id: 6, name: "Gold Hoop Earrings",      price: "₦18,000", priceNum: 18000,  img: "/product-1.jpg", badge: "New",        meta: "women accessories", occasions: ["event","casual","work"] },
-  { id: 7, name: "Tailored Blazer",         price: "₦78,000", priceNum: 78000,  img: "/product-2.jpg", badge: "New",        meta: "women clothing",    occasions: ["work","event"] },
-  { id: 8, name: "Ankle Strap Heels",       price: "₦58,500", priceNum: 58500,  img: "/product-3.jpg", badge: "Bestseller", meta: "women footwear",    occasions: ["event","work"] },
+  // Shoes
+  { id: 1, name: "Classic Black Heels",       price: "₦45,000", priceNum: 45000,  img: "/shoe-1.jpg", badge: "Bestseller", meta: "Heels",        occasions: ["event","work"], productType: "shoe" },
+  { id: 2, name: "Strappy Evening Sandals",   price: "₦52,000", priceNum: 52000,  img: "/shoe-2.jpg", badge: "New",        meta: "Sandals",      occasions: ["event"], productType: "shoe" },
+  { id: 3, name: "Pointed Toe Mules",         price: "₦38,500", priceNum: 38500,  img: "/shoe-3.jpg", badge: "New",        meta: "Mules",        occasions: ["work","casual"], productType: "shoe" },
+  { id: 4, name: "Ankle Strap Block Heels",   price: "₦48,000", priceNum: 48000,  img: "/shoe-4.jpg", badge: "Bestseller", meta: "Heels",        occasions: ["event","work"], productType: "shoe" },
+  { id: 5, name: "Metallic Platform Heels",   price: "₦56,000", priceNum: 56000,  img: "/shoe-5.jpg", badge: "New",        meta: "Heels",        occasions: ["event"], productType: "shoe" },
+  { id: 6, name: "Elegant Kitten Heels",      price: "₦42,000", priceNum: 42000,  img: "/shoe-6.jpg", badge: "New",        meta: "Heels",        occasions: ["work","event","casual"], productType: "shoe" },
+  
+  // Bags
+  { id: 7,  name: "Classic Leather Tote",     price: "₦68,000", priceNum: 68000,  img: "/bag-1.jpg", badge: "Bestseller", meta: "Tote Bags",    occasions: ["work","casual","weekend"], productType: "bag" },
+  { id: 8,  name: "Crossbody Chain Bag",      price: "₦54,000", priceNum: 54000,  img: "/bag-2.jpg", badge: "New",        meta: "Crossbody Bags", occasions: ["event","casual"], productType: "bag" },
+  { id: 9,  name: "Structured Shoulder Bag",  price: "₦72,000", priceNum: 72000,  img: "/bag-3.jpg", badge: "New",        meta: "Shoulder Bags", occasions: ["work","event"], productType: "bag" },
+  { id: 10, name: "Evening Clutch",           price: "₦38,000", priceNum: 38000,  img: "/bag-4.jpg", badge: "New",        meta: "Clutches",     occasions: ["event"], productType: "bag" },
+  { id: 11, name: "Mini Bucket Bag",          price: "₦46,000", priceNum: 46000,  img: "/bag-5.jpg", badge: "Bestseller", meta: "Mini Bags",    occasions: ["casual","weekend"], productType: "bag" },
+  { id: 12, name: "Hobo Shoulder Bag",        price: "₦62,000", priceNum: 62000,  img: "/bag-6.jpg", badge: "New",        meta: "Hobo Bags",    occasions: ["casual","weekend","work"], productType: "bag" },
 ];
 
 const occasionLabels: Record<string, string> = {
   work: "Work", weekend: "Weekend", event: "Event", casual: "Casual",
 };
 
-const categories = ["All", "women clothing", "women footwear", "women knitwear", "women accessories"];
+const categories = ["All", "Shoes", "Bags", "Heels", "Sandals", "Mules", "Tote Bags", "Crossbody Bags", "Shoulder Bags", "Clutches"];
 
 function ShopContent() {
   const searchParams = useSearchParams();
@@ -39,7 +46,17 @@ function ShopContent() {
   useEffect(() => { setActiveOccasion(occasion); }, [occasion]);
 
   const filtered = allProducts.filter((p) => {
-    const catMatch = activeCategory === "All" || p.meta === activeCategory;
+    // Category matching: handle top-level (Shoes/Bags) and specific subcategories
+    let catMatch = activeCategory === "All";
+    if (!catMatch) {
+      if (activeCategory === "Shoes") {
+        catMatch = p.productType === "shoe";
+      } else if (activeCategory === "Bags") {
+        catMatch = p.productType === "bag";
+      } else {
+        catMatch = p.meta === activeCategory;
+      }
+    }
     const occMatch = !activeOccasion || p.occasions.includes(activeOccasion);
     return catMatch && occMatch;
   });
@@ -101,7 +118,7 @@ function ShopContent() {
                     className={`px-4 py-2 rounded-full border text-[11px] uppercase tracking-[0.12em] transition-all ${
                       activeCategory === c ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground hover:border-primary"
                     }`}>
-                    {c === "All" ? "All" : c.replace("women ", "")}
+                    {c}
                   </button>
                 ))}
               </div>
@@ -134,7 +151,7 @@ function ShopContent() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {filtered.map((p) => (
-              <div key={p.id} className="glass glass-lift rounded-2xl overflow-hidden flex flex-col group">
+              <div key={p.id} className="glass glass-lift rounded-full overflow-hidden flex flex-col group">
                 <Link href={`/products/${p.id}`} className="relative aspect-[3/4] overflow-hidden bg-muted block">
                   <Image src={p.img} alt={p.name} fill
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.05]" sizes="25vw" />
@@ -144,7 +161,7 @@ function ShopContent() {
                 </Link>
                 <div className="p-4 flex flex-col gap-2">
                   <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground">{p.meta}</p>
-                  <Link href={`/products/${p.id}`} className="text-sm text-foreground hover:text-primary transition-colors">{p.name}</Link>
+                  <Link href={`/products/${p.id}`} className="text-sm text-foreground hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem]">{p.name}</Link>
                   <div className="flex items-center justify-between mt-1">
                     <p className="font-display text-base text-foreground">{p.price}</p>
                     <button onClick={() => handleQuickAdd(p)}

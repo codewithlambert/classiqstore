@@ -27,7 +27,30 @@ async function updateStatus(formData: FormData) {
   "use server";
   const sb = await getClient();
   const id = formData.get("id") as string;
-  await sb.from("orders").update({ status: formData.get("status") }).eq("id", id);
+  const status = formData.get("status") as string;
+  await sb.from("orders").update({ status }).eq("id", id);
+
+  // Send status email to customer
+  const { data: order } = await sb.from("orders").select("total_amount, shipping_address, user_id").eq("id", id).single();
+  if (order?.user_id) {
+    const { data: profile } = await sb.from("profiles").select("email, full_name").eq("id", order.user_id).single();
+    if (profile?.email) {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(".supabase.co", "") ? "https://classiqstore.pxxl.click" : "http://localhost:3000"}/api/emails/order-status`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: profile.full_name ?? "there",
+            email: profile.email,
+            orderId: id,
+            status,
+            total: order.total_amount,
+          }),
+        });
+      } catch {}
+    }
+  }
+
   revalidatePath(`/admin/orders/${id}`); revalidatePath("/admin/orders");
 }
 async function saveAdminNote(formData: FormData) {

@@ -37,6 +37,7 @@
     "caniuse-lite": "^1.0.30001791",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "nodemailer": "^8.0.10",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

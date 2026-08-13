@@ -24,11 +24,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     try {
       const payload = quoteEmail(
         request.profiles.full_name ?? "Customer",
+        request.profiles.email,
         id,
         request.product_type ?? "item",
         body.quote_amount
       );
-      payload.to = [{ email: request.profiles.email, name: request.profiles.full_name ?? "" }];
       await sendEmail(payload);
     } catch (e) { console.error("Brevo quote email failed:", e); }
   }

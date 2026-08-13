@@ -8,7 +8,7 @@ export default function AboutPage() {
         <h1 className="font-heading text-4xl text-foreground mb-4">About CLASSIQ</h1>
       </div>
 
-      <div className="relative h-72 rounded-3xl overflow-hidden mb-12">
+      <div className="relative h-72 rounded-full overflow-hidden mb-12">
         <Image src="/hero-2.jpg" alt="CLASSIQ story" fill className="object-cover object-center" />
         <div className="absolute inset-0 bg-foreground/30" />
       </div>

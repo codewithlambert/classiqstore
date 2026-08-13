@@ -7,20 +7,199 @@ import { Heart, ShoppingBag, ArrowLeft, Star } from "lucide-react";
 import { useCart } from "@/store/cart";
 
 const allProducts = [
-  { id: 1, name: "Silk Wrap Dress",          price: "₦61,500",  priceNum: 61500,  img: "/product-1.jpg", badge: "New",        meta: "women clothing",    swatches: ["#dbeafe","#93c5fd","#1e3a5f"], sizes: ["XS","S","M","L","XL"],       description: "A fluid wrap dress in 100% silk charmeuse. V-neckline, self-tie waist, and a midi-length skirt with a subtle side slit. Drapes beautifully on every body." },
-  { id: 2, name: "Cream Leather Sneakers",   price: "₦54,000",  priceNum: 54000,  img: "/product-2.jpg", badge: "Bestseller", meta: "women footwear",    swatches: ["#ffffff","#bfdbfe","#1e3a5f"], sizes: ["36","37","38","39","40","41"], description: "Clean-lined leather sneakers with a low-profile sole. Crafted from full-grain leather with a cushioned insole and tonal lace detailing. A wardrobe staple that pairs with everything." },
-  { id: 3, name: "Wide Leg Linen Trousers",  price: "₦39,500",  priceNum: 39500,  img: "/product-3.jpg", badge: "New",        meta: "women clothing",    swatches: ["#eff6ff","#93c5fd","#3b82f6"], sizes: ["XS","S","M","L","XL"],       description: "Relaxed wide-leg trousers in a breathable linen blend. High-rise waist with a flat front and side zip. Effortlessly elegant for warm-weather dressing." },
-  { id: 4, name: "Strappy Heeled Mules",     price: "₦51,500",  priceNum: 51500,  img: "/product-4.jpg", badge: "New",        meta: "women footwear",    swatches: ["#bfdbfe","#1e3a5f","#ffffff"], sizes: ["36","37","38","39","40"],       description: "Minimalist heeled mules with a thin ankle strap and a sculpted block heel. Finished in smooth nappa leather with a padded footbed." },
-  { id: 5, name: "Knit Cardigan",            price: "₦47,500",  priceNum: 47500,  img: "/product-5.jpg", badge: "Bestseller", meta: "women knitwear",    swatches: ["#dbeafe","#93c5fd","#bfdbfe"], sizes: ["XS","S","M","L","XL"],       description: "A cosy ribbed knit cardigan with an open front and dropped shoulders. Made from a soft merino blend, lightweight enough to layer all year round." },
-  { id: 6, name: "Gold Hoop Earrings",       price: "₦18,000",  priceNum: 18000,  img: "/product-1.jpg", badge: "New",        meta: "women accessories", swatches: ["#93c5fd","#e2e8f0"],           sizes: ["One Size"],                   description: "Classic oversized hoops in 18k gold-plated brass. Lightweight with a secure click-lock closure. The finishing touch to any look." },
-  { id: 7, name: "Tailored Blazer",          price: "₦78,000",  priceNum: 78000,  img: "/product-2.jpg", badge: "New",        meta: "women clothing",    swatches: ["#1e3a5f","#dbeafe","#3b82f6"], sizes: ["XS","S","M","L","XL"],       description: "A sharp single-breasted blazer with structured shoulders and a nipped waist. Woven from a wool-blend fabric with a satin-lined interior. Power dressing, refined." },
-  { id: 8, name: "Ankle Strap Heels",        price: "₦58,500",  priceNum: 58500,  img: "/product-3.jpg", badge: "Bestseller", meta: "women footwear",    swatches: ["#1e3a5f","#bfdbfe","#ffffff"], sizes: ["36","37","38","39","40","41"], description: "Sleek pointed-toe heels with an adjustable ankle strap. A 9cm stiletto heel in smooth vegan leather. Elevated enough for evenings, refined enough for the office." },
+  // Shoes
+  { 
+    id: 1, 
+    name: "Classic Black Heels", 
+    price: "₦45,000", 
+    priceNum: 45000, 
+    img: "/shoe-1.jpg", 
+    badge: "Bestseller", 
+    meta: "Heels",
+    productType: "shoe",
+    swatches: ["#000000","#8b4513","#c0c0c0"], 
+    sizes: ["36","37","38","39","40","41"], 
+    description: "Timeless black heels with a pointed toe and 8cm stiletto heel. Crafted from premium leather with cushioned insoles for all-day comfort. Perfect for the office or evening events.",
+    rating: 4.8,
+    reviewCount: 156
+  },
+  { 
+    id: 2, 
+    name: "Strappy Evening Sandals", 
+    price: "₦52,000", 
+    priceNum: 52000, 
+    img: "/shoe-2.jpg", 
+    badge: "New", 
+    meta: "Sandals",
+    productType: "shoe",
+    swatches: ["#ffd700","#c0c0c0","#000000"], 
+    sizes: ["36","37","38","39","40"], 
+    description: "Elegant strappy sandals with delicate ankle wraps and a 9cm heel. Features metallic accents and a padded footbed. Your go-to for special occasions.",
+    rating: 4.9,
+    reviewCount: 89
+  },
+  { 
+    id: 3, 
+    name: "Pointed Toe Mules", 
+    price: "₦38,500", 
+    priceNum: 38500, 
+    img: "/shoe-3.jpg", 
+    badge: "New", 
+    meta: "Mules",
+    productType: "shoe",
+    swatches: ["#d2691e","#000000","#ffffff"], 
+    sizes: ["36","37","38","39","40","41"], 
+    description: "Chic slide-on mules with a sharp pointed toe and 5cm kitten heel. Made from supple leather, perfect for transitioning from work to weekend.",
+    rating: 4.7,
+    reviewCount: 124
+  },
+  { 
+    id: 4, 
+    name: "Ankle Strap Block Heels", 
+    price: "₦48,000", 
+    priceNum: 48000, 
+    img: "/shoe-4.jpg", 
+    badge: "Bestseller", 
+    meta: "Heels",
+    productType: "shoe",
+    swatches: ["#8b4513","#000000","#c0c0c0"], 
+    sizes: ["36","37","38","39","40","41"], 
+    description: "Sturdy block heels with an elegant ankle strap. The 7cm heel provides stability while the pointed toe adds sophistication. Versatile enough for any occasion.",
+    rating: 4.9,
+    reviewCount: 203
+  },
+  { 
+    id: 5, 
+    name: "Metallic Platform Heels", 
+    price: "₦56,000", 
+    priceNum: 56000, 
+    img: "/shoe-5.jpg", 
+    badge: "New", 
+    meta: "Heels",
+    productType: "shoe",
+    swatches: ["#c0c0c0","#ffd700","#000000"], 
+    sizes: ["36","37","38","39","40"], 
+    description: "Show-stopping metallic heels with a 3cm platform and 11cm heel. Features a glamorous finish and padded insoles. Make a statement at any event.",
+    rating: 4.6,
+    reviewCount: 78
+  },
+  { 
+    id: 6, 
+    name: "Elegant Kitten Heels", 
+    price: "₦42,000", 
+    priceNum: 42000, 
+    img: "/shoe-6.jpg", 
+    badge: "New", 
+    meta: "Heels",
+    productType: "shoe",
+    swatches: ["#ffe4e1","#000000","#c0c0c0"], 
+    sizes: ["36","37","38","39","40","41"], 
+    description: "Classic kitten heels with a 4cm heel and pointed toe. Comfortable enough for all-day wear while maintaining an elegant silhouette. A wardrobe essential.",
+    rating: 4.8,
+    reviewCount: 167
+  },
+  
+  // Bags
+  { 
+    id: 7, 
+    name: "Classic Leather Tote", 
+    price: "₦68,000", 
+    priceNum: 68000, 
+    img: "/bag-1.jpg", 
+    badge: "Bestseller", 
+    meta: "Tote Bags",
+    productType: "bag",
+    swatches: ["#8b4513","#000000","#d2691e"], 
+    sizes: ["One Size"], 
+    description: "Spacious leather tote with reinforced handles and interior pockets. Dimensions: 38cm x 32cm x 12cm. Perfect for work, travel, or everyday essentials.",
+    rating: 4.9,
+    reviewCount: 245
+  },
+  { 
+    id: 8, 
+    name: "Crossbody Chain Bag", 
+    price: "₦54,000", 
+    priceNum: 54000, 
+    img: "/bag-2.jpg", 
+    badge: "New", 
+    meta: "Crossbody Bags",
+    productType: "bag",
+    swatches: ["#000000","#c0c0c0","#8b4513"], 
+    sizes: ["One Size"], 
+    description: "Compact crossbody with gold-tone chain strap. Features quilted leather and a magnetic closure. Dimensions: 22cm x 15cm x 7cm. Ideal for evenings out.",
+    rating: 4.7,
+    reviewCount: 132
+  },
+  { 
+    id: 9, 
+    name: "Structured Shoulder Bag", 
+    price: "₦72,000", 
+    priceNum: 72000, 
+    img: "/bag-3.jpg", 
+    badge: "New", 
+    meta: "Shoulder Bags",
+    productType: "bag",
+    swatches: ["#000000","#ffffff","#8b4513"], 
+    sizes: ["One Size"], 
+    description: "Polished structured bag with a detachable shoulder strap. Multiple compartments and metal hardware. Dimensions: 30cm x 22cm x 10cm. Professional and chic.",
+    rating: 4.8,
+    reviewCount: 178
+  },
+  { 
+    id: 10, 
+    name: "Evening Clutch", 
+    price: "₦38,000", 
+    priceNum: 38000, 
+    img: "/bag-4.jpg", 
+    badge: "New", 
+    meta: "Clutches",
+    productType: "bag",
+    swatches: ["#ffd700","#c0c0c0","#000000"], 
+    sizes: ["One Size"], 
+    description: "Sleek evening clutch with metallic finish and chain detail. Dimensions: 25cm x 14cm x 5cm. Holds essentials for special occasions. Features detachable chain strap.",
+    rating: 4.6,
+    reviewCount: 94
+  },
+  { 
+    id: 11, 
+    name: "Mini Bucket Bag", 
+    price: "₦46,000", 
+    priceNum: 46000, 
+    img: "/bag-5.jpg", 
+    badge: "Bestseller", 
+    meta: "Mini Bags",
+    productType: "bag",
+    swatches: ["#d2691e","#000000","#ffffff"], 
+    sizes: ["One Size"], 
+    description: "Trendy mini bucket bag with drawstring closure and crossbody strap. Dimensions: 18cm x 20cm x 10cm. Compact yet spacious for everyday essentials.",
+    rating: 4.8,
+    reviewCount: 201
+  },
+  { 
+    id: 12, 
+    name: "Hobo Shoulder Bag", 
+    price: "₦62,000", 
+    priceNum: 62000, 
+    img: "/bag-6.jpg", 
+    badge: "New", 
+    meta: "Hobo Bags",
+    productType: "bag",
+    swatches: ["#8b4513","#000000","#d2691e"], 
+    sizes: ["One Size"], 
+    description: "Relaxed hobo bag with slouchy silhouette and magnetic snap closure. Dimensions: 35cm x 28cm x 8cm. Casual elegance for weekend outings.",
+    rating: 4.7,
+    reviewCount: 143
+  },
 ];
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const product = allProducts.find((p) => p.id === Number(id)) ?? allProducts[0];
-  const related = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
+  
+  // Show related products of the same type (shoes with shoes, bags with bags)
+  const related = allProducts
+    .filter((p) => p.id !== product.id && p.productType === product.productType)
+    .slice(0, 4);
 
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState("");
@@ -81,9 +260,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           {/* Stars */}
           <div className="flex items-center gap-1.5">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={13} className="fill-accent text-accent" />
+              <Star key={i} size={13} className={i < Math.floor(product.rating) ? "fill-accent text-accent" : "text-muted-foreground"} />
             ))}
-            <span className="text-[10px] text-muted-foreground ml-1 uppercase tracking-[0.14em]">4.9 · 128 reviews</span>
+            <span className="text-[10px] text-muted-foreground ml-1 uppercase tracking-[0.14em]">{product.rating} · {product.reviewCount} reviews</span>
           </div>
 
           {/* Description */}
@@ -175,7 +354,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {related.map((p) => (
-            <Link key={p.id} href={`/products/${p.id}`} className="glass glass-lift rounded-2xl overflow-hidden flex flex-col group">
+            <Link key={p.id} href={`/products/${p.id}`} className="glass glass-lift rounded-full overflow-hidden flex flex-col group">
               <div className="relative aspect-[3/4] overflow-hidden bg-muted">
                 <Image src={p.img} alt={p.name} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.05]" sizes="25vw" />
               </div>

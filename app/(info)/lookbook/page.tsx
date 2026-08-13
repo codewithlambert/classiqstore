@@ -27,7 +27,7 @@ export default async function LookbookPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {lookbooks.map((entry: { id: string; title: string; description?: string; images?: string[] }) => (
-            <div key={entry.id} className="glass rounded-3xl overflow-hidden group">
+            <div key={entry.id} className="glass rounded-full overflow-hidden group">
               <div className="relative aspect-[4/5] overflow-hidden bg-muted">
                 {entry.images?.[0] ? (
                   <Image

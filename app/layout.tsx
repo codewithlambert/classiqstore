@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Sans } from "next/font/google";
+import { Outfit, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const playfair = Playfair_Display({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  style: ["normal", "italic"],
-  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -18,22 +17,22 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "CLASSIQ — Authored Womenswear",
+  title: "Classiq Store — Women's Shoes & Bags",
   description:
-    "CLASSIQ is a modern authored womenswear brand crafting refined pieces in soft neutrals — designed for the woman who dresses with intention.",
+    "Classiq Store crafts refined women's shoes and bags in soft neutrals — designed for the woman who accessorizes with intention.",
   metadataBase: new URL("https://classiqstore.pxxl.click"),
   openGraph: {
-    title: "CLASSIQ — Authored Womenswear",
+    title: "CLASSIQ — Women's Shoes & Bags",
     description:
-      "Modern authored womenswear in soft neutrals. Refined pieces designed for the woman who dresses with intention.",
+      "Modern women's shoes and bags in soft neutrals. Refined accessories designed for the woman who dresses with intention.",
     type: "website",
     url: "https://classiqstore.pxxl.click",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CLASSIQ — Authored Womenswear",
+    title: "CLASSIQ — Women's Shoes & Bags",
     description:
-      "Modern authored womenswear in soft neutrals. Refined pieces designed for the woman who dresses with intention.",
+      "Modern women's shoes and bags in soft neutrals. Refined accessories designed for the woman who dresses with intention.",
   },
 };
 
@@ -45,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${dmSans.variable}`}>
       <body>
         {children}
         <CartDrawer />
