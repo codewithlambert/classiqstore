@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Search,
   ShoppingBag,
@@ -24,6 +25,7 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [authUser, setAuthUser] = useState<{
     name: string;
     email: string;
@@ -37,6 +39,11 @@ export default function Header() {
   const { setOpen: openCart, count } = useCart();
   const cartCount = count();
   const isSignedIn = !!authUser;
+
+  // Determine active section based on pathname
+  const isHomeActive = pathname === "/";
+  const isCartActive = false; // Cart is a drawer, not a page
+  const isProfileActive = pathname === "/profile" || pathname === "/auth";
 
   useEffect(() => {
     const supabase = createClient();
@@ -212,40 +219,46 @@ export default function Header() {
       {/* Mobile Header - Top Pill with CLASSIQ */}
       <div className="md:hidden">
         {/* Top pill header */}
-        <header className="fixed top-6 left-1/2 -translate-x-1/2 z-40">
-          <div className="flex items-center justify-between gap-4 rounded-full border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg px-6 py-3">
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <ShoppingBag size={18} strokeWidth={1.4} className="text-foreground" />
-              <span className="font-heading text-xs tracking-[0.28em] text-foreground">
+        <header className="fixed top-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-md">
+          <div className="flex items-center justify-between gap-4 rounded-full border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg px-5 py-3">
+            <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
+              <ShoppingBag size={16} strokeWidth={1.5} className="text-foreground shrink-0" />
+              <span className="font-heading text-[11px] tracking-[0.24em] text-foreground whitespace-nowrap">
                 CLASSIQ
               </span>
             </Link>
             <button
               onClick={() => setSearchOpen(true)}
-              className="rounded-full p-2 text-foreground/70 hover:text-foreground transition-colors"
+              className="rounded-full p-2 text-foreground/70 hover:text-foreground transition-colors shrink-0"
               aria-label="Search"
             >
-              <Search size={18} strokeWidth={1.4} />
+              <Search size={16} strokeWidth={1.5} />
             </button>
           </div>
         </header>
 
         {/* Bottom pill navbar */}
         <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-          <div className="flex items-center gap-3 rounded-full border border-white/20 bg-white/10 backdrop-blur-xl shadow-2xl px-6 py-4">
+          <div className="relative flex items-center gap-3 rounded-full border border-white/20 bg-white/10 backdrop-blur-xl shadow-2xl px-6 py-4">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="rounded-full p-2 text-foreground/70 transition-colors hover:text-foreground"
+              className="relative rounded-full p-2 text-foreground/70 transition-all hover:text-foreground"
               aria-label="Menu"
             >
-              {menuOpen ? <X size={18} strokeWidth={1.4} /> : <Menu size={18} strokeWidth={1.4} />}
+              {(menuOpen || isHomeActive) && (
+                <span className="absolute inset-0 -z-10 animate-in fade-in zoom-in-95 duration-200 rounded-full bg-gradient-to-b from-white/30 to-white/10 backdrop-blur-md shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_2px_8px_rgba(0,0,0,0.1)] scale-[1.4]" />
+              )}
+              {menuOpen ? <X size={18} strokeWidth={1.4} className={menuOpen ? "text-foreground" : ""} /> : <Menu size={18} strokeWidth={1.4} className={isHomeActive ? "text-foreground" : ""} />}
             </button>
             <button
               onClick={() => openCart(true)}
-              className="relative rounded-full p-2 text-foreground/70 transition-colors hover:text-foreground"
+              className="relative rounded-full p-2 text-foreground/70 transition-all hover:text-foreground"
               aria-label="Cart"
             >
-              <ShoppingBag size={18} strokeWidth={1.4} />
+              {isCartActive && (
+                <span className="absolute inset-0 -z-10 animate-in fade-in zoom-in-95 duration-200 rounded-full bg-gradient-to-b from-white/30 to-white/10 backdrop-blur-md shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_2px_8px_rgba(0,0,0,0.1)] scale-[1.4]" />
+              )}
+              <ShoppingBag size={18} strokeWidth={1.4} className={isCartActive ? "text-foreground" : ""} />
               {cartCount > 0 && (
                 <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-navy text-[9px] font-medium text-primary-foreground">
                   {cartCount}
@@ -254,9 +267,20 @@ export default function Header() {
             </button>
             <Link
               href={isSignedIn ? "/profile" : "/auth"}
-              className="rounded-full p-2 text-foreground/70 transition-colors hover:text-foreground"
+              className="relative rounded-full p-2 text-foreground/70 transition-all hover:text-foreground"
               aria-label="Account"
             >
+              {isProfileActive && (
+                <span className="absolute inset-0 -z-10 animate-in fade-in zoom-in-95 duration-200 rounded-full bg-gradient-to-b from-white/30 to-white/10 backdrop-blur-md shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_2px_8px_rgba(0,0,0,0.1)] scale-[1.4]" />
+              )}
+              {isSignedIn ? (
+                <div className={`flex h-5 w-5 items-center justify-center rounded-full bg-navy text-[9px] font-medium text-primary-foreground ${isProfileActive ? "ring-2 ring-white/50" : ""}`}>
+                  {authUser!.initials}
+                </div>
+              ) : (
+                <User size={18} strokeWidth={1.4} className={isProfileActive ? "text-foreground" : ""} />
+              )}
+            </Link>
               {isSignedIn ? (
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-navy text-[9px] font-medium text-primary-foreground">
                   {authUser!.initials}

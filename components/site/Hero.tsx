@@ -17,7 +17,7 @@ export default function Hero() {
             <PillButton href="/shop">Shop the collection</PillButton>
           </div>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground md:text-right md:text-[15px]">
-            Refined women&apos;s shoes and bags in soft neutrals — designed for
+            Refined women&apos;s shoes and bags in soft neutrals designed for
             the woman who accessorizes with intention.
           </p>
         </div>
@@ -35,10 +35,10 @@ export default function Hero() {
             sizes="100vw"
           />
         </div>
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden px-4">
           <span
             aria-hidden
-            className="select-none whitespace-nowrap font-heading text-[clamp(4rem,18vw,13rem)] font-medium leading-none tracking-tight text-white/90"
+            className="select-none text-center font-heading text-[clamp(2.5rem,12vw,13rem)] font-medium leading-[0.95] tracking-tight text-white/90 md:whitespace-nowrap md:text-[clamp(4rem,18vw,13rem)]"
           >
             CLASSIQ STORE
           </span>
