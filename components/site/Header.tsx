@@ -281,14 +281,6 @@ export default function Header() {
                 <User size={18} strokeWidth={1.4} className={isProfileActive ? "text-foreground" : ""} />
               )}
             </Link>
-              {isSignedIn ? (
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-navy text-[9px] font-medium text-primary-foreground">
-                  {authUser!.initials}
-                </div>
-              ) : (
-                <User size={18} strokeWidth={1.4} />
-              )}
-            </Link>
           </div>
         </nav>
       </div>
