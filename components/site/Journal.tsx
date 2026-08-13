@@ -32,7 +32,7 @@ export default function Journal() {
           <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
             From the journal
           </p>
-          <h2 className="font-heading text-3xl tracking-tight text-foreground md:text-[2.75rem]">
+          <h2 className="font-heading text-3xl tracking-tight text-foreground md:text-[2.75rem] lg:text-5xl">
             Stories &amp; style notes
           </h2>
         </div>
@@ -41,7 +41,7 @@ export default function Journal() {
           {/* Tall card */}
           <Link
             href="/lookbook"
-            className="group relative row-span-2 min-h-[360px] overflow-hidden rounded-full md:min-h-0"
+            className="group relative row-span-2 min-h-[460px] overflow-hidden rounded-full md:min-h-[560px]"
           >
             <Image
               src={siteImages.journalTall}
@@ -51,17 +51,17 @@ export default function Journal() {
               sizes="(max-width: 768px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-foreground/25" />
-            <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8">
+            <div className="absolute inset-0 flex flex-col justify-between p-8 md:p-12">
               <span className="flex h-20 w-20 items-center justify-center self-start rounded-full border border-white/60 bg-white/10 text-center text-[11px] uppercase leading-tight tracking-wide text-white backdrop-blur-sm">
                 Read
                 <br />
                 Now
               </span>
-              <div>
-                <h3 className="font-heading text-2xl tracking-tight text-white md:text-3xl">
+              <div className="max-w-md">
+                <h3 className="font-heading text-[1.75rem] leading-[1.1] tracking-tight text-white md:text-4xl lg:text-5xl">
                   Spring Edit 2026
                 </h3>
-                <p className="mt-2 max-w-xs text-sm text-white/80">
+                <p className="mt-4 text-base leading-relaxed text-white/90 md:text-lg">
                   A quiet palette for bold women.
                 </p>
               </div>
@@ -73,7 +73,7 @@ export default function Journal() {
             <Link
               key={card.title}
               href={card.href}
-              className="group relative min-h-[180px] overflow-hidden rounded-full md:min-h-[200px]"
+              className="group relative min-h-[260px] overflow-hidden rounded-full md:min-h-[270px]"
             >
               <Image
                 src={card.img}
@@ -83,11 +83,13 @@ export default function Journal() {
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 to-foreground/40" />
-              <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-6">
-                <h3 className="font-heading text-lg tracking-tight text-white md:text-xl">
-                  {card.title}
-                </h3>
-                <p className="mt-1 text-sm text-white/75">{card.excerpt}</p>
+              <div className="absolute inset-0 flex flex-col justify-end p-7 md:p-9">
+                <div className="max-w-lg">
+                  <h3 className="font-heading text-[1.4rem] leading-[1.15] tracking-tight text-white md:text-[1.75rem] lg:text-[2rem]">
+                    {card.title}
+                  </h3>
+                  <p className="mt-3 text-base leading-relaxed text-white/90 md:text-[1.05rem]">{card.excerpt}</p>
+                </div>
               </div>
             </Link>
           ))}

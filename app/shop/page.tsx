@@ -159,16 +159,16 @@ function ShopContent() {
                     p.badge === "New" ? "bg-primary text-primary-foreground" : "bg-foreground text-background"
                   }`}>{p.badge}</span>
                 </Link>
-                <div className="p-4 flex flex-col gap-2">
-                  <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground">{p.meta}</p>
-                  <Link href={`/products/${p.id}`} className="text-sm text-foreground hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem]">{p.name}</Link>
-                  <div className="flex items-center justify-between mt-1">
-                    <p className="font-display text-base text-foreground">{p.price}</p>
+                <div className="p-5 flex flex-col gap-2.5">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{p.meta}</p>
+                  <Link href={`/products/${p.id}`} className="text-[15px] leading-snug text-foreground hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">{p.name}</Link>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="font-display text-lg text-foreground">{p.price}</p>
                     <button onClick={() => handleQuickAdd(p)}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
                         addedId === p.id ? "bg-accent text-primary-foreground" : "bg-primary text-primary-foreground hover:bg-accent"
                       }`}>
-                      <ShoppingBag size={13} strokeWidth={1.5} />
+                      <ShoppingBag size={14} strokeWidth={1.5} />
                     </button>
                   </div>
                 </div>

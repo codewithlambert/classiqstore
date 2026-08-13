@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section className="bg-background">
       {/* Top copy row */}
-      <div className="mx-auto max-w-7xl px-5 pb-10 pt-12 md:px-8 md:pb-14 md:pt-16">
+      <div className="mx-auto max-w-7xl px-5 pb-10 pt-24 md:px-8 md:pb-14 md:pt-16">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div className="flex max-w-lg flex-col gap-6">
             <h1 className="font-heading text-[2.75rem] leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-[4.25rem]">
