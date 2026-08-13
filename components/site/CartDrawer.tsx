@@ -87,7 +87,7 @@ export default function CartDrawer() {
                         </div>
                       </div>
                       <button
-                        onClick={() => removeItem(item.id, item.size, item.color)}
+                        onClick={() => removeItem(item.id, item.size ?? "", item.color ?? "")}
                         className="text-muted-foreground hover:text-rose-500 transition-colors shrink-0 mt-0.5"
                       >
                         <Trash2 size={14} strokeWidth={1.5} />
@@ -98,14 +98,14 @@ export default function CartDrawer() {
                       {/* Qty controls */}
                       <div className="flex items-center gap-1 border border-border rounded-full px-1 py-1">
                         <button
-                          onClick={() => updateQty(item.id, item.size, item.color, item.qty - 1)}
+                          onClick={() => updateQty(item.id, item.size ?? "", item.color ?? "", item.qty - 1)}
                           className="w-6 h-6 rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors"
                         >
                           <Minus size={11} strokeWidth={2} />
                         </button>
                         <span className="text-sm font-medium text-foreground w-6 text-center">{item.qty}</span>
                         <button
-                          onClick={() => updateQty(item.id, item.size, item.color, item.qty + 1)}
+                          onClick={() => updateQty(item.id, item.size ?? "", item.color ?? "", item.qty + 1)}
                           className="w-6 h-6 rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors"
                         >
                           <Plus size={11} strokeWidth={2} />
